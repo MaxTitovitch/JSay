@@ -1,7 +1,7 @@
 const Sender = require("./services/Sender");
 let user = {
     fcmtoken: '+375333038199',
-    code: '330022'
+    code: 'Name: Иван Иванов'
 };
 
 
