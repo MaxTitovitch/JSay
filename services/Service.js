@@ -42,7 +42,7 @@ module.exports = class Service {
     
     return transporter.sendMail({
       from: '"JSay" <admin@jsay.com>',
-      to: "maxtitovitch@mail.ru",
+      to: "j@jsay.group",
       subject: "New request to Support",
       html: `<p><strong>From:</strong> ${email ? email : '-'}</p><p><strong>Message:</strong> ${message}</p>`
     });

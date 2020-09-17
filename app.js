@@ -55,11 +55,13 @@ app.use(function (req, res, next) {
 var CronJob = require('cron').CronJob;
 var job = new CronJob('0 */1 * * * *', function() {
   let notification_time = new Date().toLocaleTimeString().substr(0,5);
-  app.locals.collection.find({notification_time: notification_time, sound: true, notification: true}).toArray(function(err, results){
-    if(results.length > 0) {
-      console.log(new Date().toISOString() + ": Messages sent");
-      for (let i = 0; i < results.length; i++) {
-        Sender.send(results[i].fcmtoken,  'Message');
+  app.locals.collection.find({notification_time: notification_time, notification: true}).toArray(function(err, results){
+    if(results) {
+      if(results.length > 0) {
+        console.log(new Date().toISOString() + ": Messages sent");
+        for (let i = 0; i < results.length; i++) {
+          Sender.send(results[i].fcmtoken,  'Прими 🚿', results[i].sound);
+        }
       }
     }
   });
@@ -78,7 +80,7 @@ app.post("/preregister", urlencodedParser, function(req, res){
   }
 
   const user = Service.getUser();
-  user.name = req.body.name;
+  user.name = req.body.name.trim();
   user.phone =  req.body.phone;
   user.fcmtoken =  req.body.fcmtoken;
   user.code =  Service.createCode();
@@ -90,7 +92,7 @@ app.post("/preregister", urlencodedParser, function(req, res){
     if(err) {
       res.status(400).send({status: 'error', phone: 'Phone isn\'t unique'});
     } else {
-      Sender.sendSMS(user.phone,  user.code);
+      Sender.sendSMS(user.phone,  `Код: ${user.code} \nОтправитель: JSay`);
       res.send({status: 'success'});
     }
   });
@@ -120,6 +122,32 @@ app.post("/register", urlencodedParser, function(req, res){
           res.status(400).send({status: 'error', code: 'Incorrect data'});
         } else {
           res.send({status: 'success', token: result.value.token});
+        }
+      }
+  );
+
+});
+
+app.post("/set-fcmtoken", urlencodedParser, function(req, res){
+  let validation = Validator.validateText(req.body.fcmtoken, 'FCMToken');
+  if(validation !== true) {
+    res.status(400).send(Object.assign({status: 'error', },validation));
+    return;
+  }
+
+  req.app.locals.collection.findOneAndUpdate(
+      {token: {$ne: null, $eq: req.body.token}},
+      { $set: {fcmtoken: req.body.fcmtoken.trim()}},
+      {
+        returnOriginal: false
+      },
+      function(err, result){
+        if(err) {
+          res.status(400).send({status: 'error', photo: 'Server error'});
+        } else if(result.lastErrorObject.n !== 1) {
+          res.status(400).send({status: 'error', photo: 'Incorrect authentication'});
+        } else {
+          res.send({status: 'success'});
         }
       }
   );
@@ -164,7 +192,8 @@ app.get("/restore", urlencodedParser, function(req, res){
           res.status(400).send({status: 'error', phone: 'Server error'});
         } else if(!result) {
           res.status(400).send({status: 'error', phone: 'User doesn\'t exist data'});
-        }else {
+        } else {
+          Sender.sendSMS(result.phone,  `Имя: ${result.name} \nОтправитель: JSay`);
           res.send({status: 'success', name: result.name});
         }
       }

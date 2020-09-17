@@ -1,7 +1,11 @@
 let FCM = require('fcm-node');
 let serverKey = 'AAAA_zkXm70:APA91bEhCvRxVXWS7pfayvUALYZHL5JQ5Ir6y_REzeKmJaSdcUIv9sYbCA5Ajh2es07jmzFTDP2bOSEAmfM05jSRajoD_nICGpajbMN05M7NsHTey2ITqdobDRd60c9B8iO9Wgjn2Kt_';
 let fcm = new FCM(serverKey);
+<<<<<<< HEAD
 const queryString = require('query-string');
+=======
+let queryString = require('query-string');
+>>>>>>> a3c56cadcf637ad63e9b68df30459b83e47f51a8
 
 const axios = require('axios').default;
 const userName = 'jsay';
@@ -10,16 +14,23 @@ axios.defaults.headers.get['Content-Type'] = 'application/json, text/plain, */*;
 
 
 module.exports = class Service {
-    static send(deviceId, code) {
+    static send(deviceId, code, sound) {
 
+        sound = sound === 'true' ? true : (sound === 'false' ? false : sound);
+        console.log(sound);
         let message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
             to: deviceId,
 
             notification: {
                 title: 'JSay',
-                body: `Code: ${code}`
+                body: `${code}`
             },
+            
         };
+        if(sound === true) {
+            message.notification.sound = true;
+            message.sound = true;
+        }
 
         fcm.send(message, function (err, response) {
             if (err) {
@@ -36,15 +47,20 @@ module.exports = class Service {
             pass: password,
             to: phone.substr(1),
             txt: code
+<<<<<<< HEAD
         });
         axios.get(`https://api3.greensms.ru/sms/send?${query}`)
+=======
+        };
+        axios.get(`https://api3.greensms.ru/sms/send?${queryString.stringify(data)}`)
+>>>>>>> a3c56cadcf637ad63e9b68df30459b83e47f51a8
             .then(function (response) {
                 console.log(response);
             })
             .catch(function (error) {
-                console.log(error.response.data);
+                console.log(error.response);
             });
-        // axios.get('http://api3.greensms.ru/sms/status?user=jsay&pass=jsay2020&id=bd414c1f-5c52-4aa2-aa22-119329e02110')
+        // axios.get('http://api3.greensms.ru/sms/status?user=jsay&pass=jsay2020&id=38e73b15-ca61-407c-b36e-cad936fbb04a')
         //     .then(function (response) {
         //         console.log(response);
         //     })
