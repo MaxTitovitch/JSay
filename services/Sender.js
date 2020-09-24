@@ -38,13 +38,13 @@ module.exports = class Service {
     }
 
     static sendSMS(phone, code) {
-        let query = queryString.stringify({
+        let data = {
             user: userName,
             pass: password,
             to: phone.substr(1),
             txt: code
-        });
-        axios.get(`https://api3.greensms.ru/sms/send?${query}`)
+        };
+        axios.get(`https://api3.greensms.ru/sms/send?${queryString.stringify(data)}`)
             .then(function (response) {
                 console.log(response);
             })
