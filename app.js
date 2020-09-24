@@ -76,7 +76,7 @@ app.use(formData.format());
 app.use(formData.stream());
 app.use(formData.union());
 
-app.use(express.static(__dirname + "/static"));
+app.use("/static", express.static(__dirname + "/static"));
 
 mongoClient.connect(function(err, client){
   if(err) {
