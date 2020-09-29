@@ -385,7 +385,7 @@ app.post("/set-notification", urlencodedParser, function(req, res){
 
   req.app.locals.collection.findOneAndUpdate(
       {token: {$ne: null, $eq: req.body.token}},
-      { $set: {notification: notification, notification_time: notification !== false ? req.body.notification_time : null}},
+      { $set: {notification: notification, notification_time: req.body.notification_time}},
       {
         returnOriginal: false
       },
